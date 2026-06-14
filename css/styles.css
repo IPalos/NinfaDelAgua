@@ -1,0 +1,220 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0B1D33;
+  --surface: #132D4A;
+  --bar-track: #1E3A5F;
+  --teal: #0D9488;
+  --teal-light: #2DD4BF;
+  --accent: #14B8A6;
+  --text: #E2F4F7;
+  --text-muted: #7BA3B5;
+  --disabled: #3D5A73;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
+  padding: 1rem;
+  user-select: none;
+}
+
+.app {
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 480px;
+  height: min(90dvh, 640px);
+}
+
+/* --- Bar panel --- */
+
+.bar-panel {
+  flex: 0 0 35%;
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  height: 100%;
+}
+
+.bar-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.25rem 0;
+  min-width: 2rem;
+}
+
+.bar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.bar-label.active {
+  color: var(--teal-light);
+}
+
+.bar-track {
+  flex: 1;
+  background: var(--bar-track);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--surface);
+}
+
+.bar-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(to top, var(--teal), var(--teal-light));
+  border-radius: 0 0 999px 999px;
+  transition: height 0.3s ease;
+}
+
+/* Threshold tick marks on the bar track */
+.bar-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bar-tick {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(226, 244, 247, 0.25);
+}
+
+/* --- Controls --- */
+
+.controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.turn-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--teal-light);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.btn {
+  border: 2px solid var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--disabled);
+}
+
+.btn-round {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-round .arrow {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.btn-mute {
+  width: 52px;
+  height: 52px;
+  margin-top: 0.5rem;
+}
+
+.btn-mute .mute-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.btn-mute {
+  position: relative;
+}
+
+.btn-mute.muted::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 60%;
+  background: #e74c3c;
+  transform: rotate(-45deg);
+  top: 20%;
+  left: calc(50% - 1px);
+  pointer-events: none;
+}
+
+.btn-reset {
+  margin-top: auto;
+  padding: 0.75rem 2.5rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: var(--teal);
+  border-color: var(--teal-light);
+  color: var(--bg);
+}
+
+.btn-reset:hover:not(:disabled),
+.btn-round:hover:not(:disabled) {
+  background: #1a4068;
+}
+
+.btn-reset:hover:not(:disabled) {
+  background: var(--accent);
+}
+
+@media (max-width: 360px) {
+  .btn-round {
+    width: 60px;
+    height: 60px;
+  }
+
+  .turn-display {
+    font-size: 2rem;
+  }
+}

@@ -1,0 +1,187 @@
+const AudioEngine = (() => {
+  let ctx = null;
+  let masterGain = null;
+  let tracks = [];
+  let activeIndex = -1;
+  let trackStartTime = 0;
+  let isMuted = false;
+  let isStarted = false;
+  let pendingTarget = null;
+  let pendingTimeouts = [];
+
+  function ensureContext() {
+    if (!ctx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      ctx = new Ctx();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = isMuted ? 0 : 1;
+      masterGain.connect(ctx.destination);
+    }
+    if (ctx.state === "suspended") {
+      ctx.resume();
+    }
+    return ctx;
+  }
+
+  function createTrack(index, src) {
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.addEventListener("error", () => {
+      console.warn(`[AudioEngine] Could not load track ${index}: ${src}`);
+    });
+    return { index, audio, source: null, gain: null };
+  }
+
+  function connectTrack(track) {
+    if (track.source) return;
+    const context = ensureContext();
+    track.source = context.createMediaElementSource(track.audio);
+    track.gain = context.createGain();
+    track.gain.gain.value = 0;
+    track.source.connect(track.gain);
+    track.gain.connect(masterGain);
+  }
+
+  function init() {
+    tracks = CONFIG.tracks.map((t, i) => createTrack(i, t.src));
+  }
+
+  function clearPending() {
+    pendingTimeouts.forEach((id) => clearTimeout(id));
+    pendingTimeouts = [];
+
+    if (ctx) {
+      const now = ctx.currentTime;
+      tracks.forEach((track) => {
+        if (track.gain) {
+          track.gain.gain.cancelScheduledValues(now);
+        }
+      });
+    }
+    pendingTarget = null;
+  }
+
+  function timeToBarEnd() {
+    const elapsed = ctx.currentTime - trackStartTime;
+    const barDur = CONFIG.barDurationSec;
+    return barDur - (elapsed % barDur);
+  }
+
+  function stopTrack(index) {
+    const track = tracks[index];
+    if (!track) return;
+    track.audio.pause();
+    if (track.gain && ctx) {
+      track.gain.gain.cancelScheduledValues(ctx.currentTime);
+      track.gain.gain.value = 0;
+    }
+  }
+
+  function playTrack(index, gainValue) {
+    const track = tracks[index];
+    if (!track) return;
+    connectTrack(track);
+    const now = ctx.currentTime;
+    track.gain.gain.cancelScheduledValues(now);
+    track.gain.gain.setValueAtTime(gainValue, now);
+    track.audio.play().catch((err) => {
+      console.warn("[AudioEngine] Playback failed:", err.message);
+    });
+  }
+
+  function performCrossfade(fromIndex, toIndex) {
+    const now = ctx.currentTime;
+    const wait = timeToBarEnd();
+    const crossfadeDur = CONFIG.crossfadeBars * CONFIG.barDurationSec;
+    const fadeStart = now + wait;
+    const fadeEnd = fadeStart + crossfadeDur;
+
+    const fromTrack = tracks[fromIndex];
+    if (fromTrack?.gain) {
+      const currentGain = fromTrack.gain.gain.value;
+      fromTrack.gain.gain.setValueAtTime(currentGain, now);
+      fromTrack.gain.gain.setValueAtTime(currentGain, fadeStart);
+      fromTrack.gain.gain.linearRampToValueAtTime(0, fadeEnd);
+    }
+
+    const toTrack = tracks[toIndex];
+    connectTrack(toTrack);
+    toTrack.gain.gain.setValueAtTime(0, now);
+    toTrack.gain.gain.setValueAtTime(0, fadeStart);
+    toTrack.gain.gain.linearRampToValueAtTime(1, fadeEnd);
+
+    const playDelay = Math.max(0, (fadeStart - now) * 1000);
+    const playId = setTimeout(() => {
+      toTrack.audio.currentTime = 0;
+      toTrack.audio.play().catch(() => {});
+    }, playDelay);
+    pendingTimeouts.push(playId);
+
+    const finishId = setTimeout(() => {
+      stopTrack(fromIndex);
+      activeIndex = toIndex;
+      trackStartTime = fadeEnd;
+      pendingTarget = null;
+    }, (wait + crossfadeDur) * 1000 + 50);
+    pendingTimeouts.push(finishId);
+  }
+
+  function queueCrossfade(targetIndex) {
+    if (!isStarted || targetIndex < 0 || targetIndex >= tracks.length) return;
+
+    ensureContext();
+    clearPending();
+
+    if (activeIndex < 0) {
+      playTrack(targetIndex, 1);
+      activeIndex = targetIndex;
+      trackStartTime = ctx.currentTime;
+      return;
+    }
+
+    if (activeIndex === targetIndex) return;
+
+    tracks.forEach((_, i) => {
+      if (i !== activeIndex) stopTrack(i);
+    });
+    const active = tracks[activeIndex];
+    if (active?.gain) {
+      active.gain.gain.setValueAtTime(1, ctx.currentTime);
+      if (active.audio.paused) active.audio.play().catch(() => {});
+    }
+
+    pendingTarget = targetIndex;
+    performCrossfade(activeIndex, targetIndex);
+  }
+
+  function start(targetIndex) {
+    ensureContext();
+    clearPending();
+    isStarted = true;
+    tracks.forEach((_, i) => stopTrack(i));
+
+    activeIndex = targetIndex;
+    playTrack(targetIndex, 1);
+    trackStartTime = ctx.currentTime;
+    pendingTarget = null;
+  }
+
+  function stop() {
+    clearPending();
+    tracks.forEach((_, i) => stopTrack(i));
+    activeIndex = -1;
+    isStarted = false;
+  }
+
+  function setMuted(muted) {
+    isMuted = muted;
+    if (masterGain) {
+      masterGain.gain.value = muted ? 0 : 1;
+    }
+  }
+
+  init();
+
+  return { start, stop, setMuted, queueCrossfade };
+})();
