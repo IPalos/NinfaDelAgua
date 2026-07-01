@@ -20,3 +20,13 @@ const CONFIG = {
     { src: "assets/audio/track-zone-5.mp3" },
   ],
 };
+
+function computeThresholds(maxTurn) {
+  if (maxTurn === 40) return [40, 30, 20, 10, 5, 0];
+
+  const ratios = [1, 0.75, 0.5, 0.25, 0.125, 0];
+  const raw = ratios.map((r) => Math.round(maxTurn * r));
+  const unique = [...new Set(raw)].sort((a, b) => b - a);
+  if (unique[unique.length - 1] !== 0) unique.push(0);
+  return unique;
+}

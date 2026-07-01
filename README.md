@@ -1,16 +1,36 @@
 # NinfaDelAgua — Turn Counter
 
-A mobile-first turn counter for physical board games. Counts down from 40 to 0 with a vertical progress bar and a soundtrack that crossfades between tracks at configurable turn thresholds.
+A mobile-first companion app for the Ninfa del Agua board game. Guides players through a main menu, game setup, and a turn counter with research points tracking, strike indicators, and a soundtrack that crossfades between tracks at configurable turn thresholds.
 
 Built with plain HTML5, CSS, and JavaScript. No build step required.
 
 ## Features
 
-- Vertical **Trimix bar** with marks at 40, 30, 20, 10, 5, and 0
+### Navigation
+
+1. **Main menu** — placeholder logo and **Comenzar Juego** button
+2. **Game settings** — choose partida corta or completa, and 2–4 players
+3. **Turn counter** — vertical Trimix bar, controls, and game state tracking
+
+### Game modes
+
+| Mode | Turns per player | Total turns (2 / 3 / 4 players) |
+|------|------------------|----------------------------------|
+| Partida corta | 6 | 12 / 18 / 24 |
+| Partida completa | 10 | 20 / 30 / 40 |
+
+Bar labels and audio zones scale automatically to the selected game length.
+
+### Turn counter screen
+
+- Vertical **Trimix bar** with dynamic threshold marks
+- **Puntos de investigación** counter with increment/decrement arrows
 - **+1 / −1** turn buttons with bidirectional track crossfading
+- **3-strike** buttons (toggle between active circle and broken artifact icon)
 - **Mute** toggle (scheduling continues while muted)
-- **Reset** starts a new game at turn 40 and begins the soundtrack
-- Bar-synced crossfades: current track finishes its bar, then both tracks overlap for one bar with fade out / fade in
+- **Reset** restores turn count, research points, and strikes; starts the soundtrack
+
+Audio requires a user gesture (press **Reset**) before playback starts.
 
 ## Local preview
 
@@ -24,16 +44,17 @@ python3 -m http.server 8080
 npx serve .
 ```
 
-Open `http://localhost:8080` in your browser. Audio requires a user gesture (press **Reset**) before playback starts.
+Open `http://localhost:8080` in your browser.
 
 ## Configuration
 
-All tunables live in [`js/config.js`](js/config.js):
+Runtime game settings are chosen on the settings screen. Static tunables live in [`js/config.js`](js/config.js):
 
 | Setting | Description |
 |---------|-------------|
-| `maxTurn` / `minTurn` | Turn range (default 40 → 0) |
+| `maxTurn` / `minTurn` | Default turn range (overridden per session) |
 | `thresholds` | Bar labels and track zone boundaries |
+| `computeThresholds()` | Generates proportional thresholds for shorter games |
 | `barDurationSec` | Length of one musical bar in seconds |
 | `crossfadeBars` | How many bars the overlap lasts (default 1) |
 | `tracks` | Audio file paths, one per zone |
@@ -70,12 +91,15 @@ The included [`.nojekyll`](.nojekyll) file prevents Jekyll from interfering with
 ## Project structure
 
 ```
-index.html          Page markup
-css/styles.css      Mobile layout and deep blue / teal theme
-js/config.js        Thresholds, bar timing, track paths
-js/audio.js         Web Audio API crossfade engine
-js/app.js           UI and game logic
-assets/audio/       Soundtrack files (add your own MP3s)
+index.html              All screens (menu, settings, game)
+css/styles.css          Mobile layout and deep blue / teal theme
+js/config.js            Thresholds, bar timing, track paths
+js/nav.js               Screen routing
+js/settings.js          Game settings UI and turn computation
+js/audio.js             Web Audio API crossfade engine
+js/app.js               Turn counter and game state logic
+assets/images/          Logo and strike icons (placeholders)
+assets/audio/           Soundtrack files (add your own MP3s)
 ```
 
 ## License

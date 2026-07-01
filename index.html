@@ -1,42 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1D33">
-  <title>Turn Counter</title>
+  <title>Ninfa del Agua</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <main class="app">
-    <section class="bar-panel" aria-label="Turn progress">
-      <div class="bar-labels" id="bar-labels"></div>
-      <div class="bar-track">
-        <div class="bar-fill" id="bar-fill"></div>
-      </div>
+    <!-- Main Menu -->
+    <section id="screen-menu" class="screen screen-menu" aria-label="Menú principal">
+      <img
+        class="menu-logo"
+        src="assets/images/logo-placeholder.svg"
+        alt="Ninfa del Agua"
+        width="240"
+        height="120"
+      >
+      <button type="button" class="btn btn-primary" id="btn-start-menu">Comenzar Juego</button>
     </section>
 
-    <section class="controls" aria-label="Game controls">
-      <p class="turn-display" id="turn-display" aria-live="polite">40</p>
+    <!-- Game Settings -->
+    <section id="screen-settings" class="screen screen-settings screen--hidden" aria-label="Configuración de partida">
+      <h1 class="screen-title">Configuración</h1>
 
-      <button type="button" class="btn btn-round btn-plus" id="btn-plus" aria-label="Add one turn">
-        <span class="arrow" aria-hidden="true">&#9650;</span>
-      </button>
+      <fieldset class="settings-group">
+        <legend class="settings-label">Tipo de partida</legend>
+        <div class="option-row" role="group" aria-label="Tipo de partida">
+          <button type="button" class="btn option-btn" data-setting="mode" data-value="short" aria-pressed="true">
+            Partida corta
+          </button>
+          <button type="button" class="btn option-btn" data-setting="mode" data-value="complete" aria-pressed="false">
+            Partida completa
+          </button>
+        </div>
+      </fieldset>
 
-      <button type="button" class="btn btn-round btn-minus" id="btn-minus" aria-label="Subtract one turn">
-        <span class="arrow" aria-hidden="true">&#9660;</span>
-      </button>
+      <fieldset class="settings-group">
+        <legend class="settings-label">Jugadores</legend>
+        <div class="option-row" role="group" aria-label="Número de jugadores">
+          <button type="button" class="btn option-btn" data-setting="players" data-value="2" aria-pressed="true">2</button>
+          <button type="button" class="btn option-btn" data-setting="players" data-value="3" aria-pressed="false">3</button>
+          <button type="button" class="btn option-btn" data-setting="players" data-value="4" aria-pressed="false">4</button>
+        </div>
+      </fieldset>
 
-      <button type="button" class="btn btn-round btn-mute" id="btn-mute" aria-label="Mute" aria-pressed="false">
-        <span class="mute-icon" aria-hidden="true">&#128266;</span>
-      </button>
+      <button type="button" class="btn btn-primary" id="btn-start-game">Iniciar partida</button>
+    </section>
 
-      <button type="button" class="btn btn-reset" id="btn-reset">Reset</button>
+    <!-- Turn Counter -->
+    <section id="screen-game" class="screen screen-game screen--hidden" aria-label="Contador de turnos">
+      <div class="bar-panel" aria-label="Progreso de turnos">
+        <div class="bar-labels" id="bar-labels"></div>
+        <div class="bar-track">
+          <div class="bar-fill" id="bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="game-panel">
+        <div class="research-points" aria-label="Puntos de investigación">
+          <p class="research-label">Puntos de investigación</p>
+          <div class="research-controls">
+            <button type="button" class="btn btn-arrow" id="btn-research-minus" aria-label="Restar punto de investigación">
+              <span aria-hidden="true">&#9664;</span>
+            </button>
+            <span class="research-value" id="research-display" aria-live="polite">0</span>
+            <button type="button" class="btn btn-arrow" id="btn-research-plus" aria-label="Sumar punto de investigación">
+              <span aria-hidden="true">&#9654;</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <div class="turn-controls" aria-label="Controles de turno">
+            <button type="button" class="btn btn-round btn-plus" id="btn-plus" aria-label="Sumar un turno">
+              <span class="arrow" aria-hidden="true">&#9650;</span>
+            </button>
+            <button type="button" class="btn btn-round btn-minus" id="btn-minus" aria-label="Restar un turno">
+              <span class="arrow" aria-hidden="true">&#9660;</span>
+            </button>
+            <button type="button" class="btn btn-round btn-mute" id="btn-mute" aria-label="Silenciar" aria-pressed="false">
+              <span class="mute-icon" aria-hidden="true">&#128266;</span>
+            </button>
+          </div>
+
+          <div class="strike-controls" aria-label="Strikes">
+            <button type="button" class="strike-btn" id="strike-0" aria-label="Strike 1" aria-pressed="false">
+              <img class="strike-icon strike-icon--broken" src="assets/images/artifact-broken.svg" alt="" aria-hidden="true">
+            </button>
+            <button type="button" class="strike-btn" id="strike-1" aria-label="Strike 2" aria-pressed="false">
+              <img class="strike-icon strike-icon--broken" src="assets/images/artifact-broken.svg" alt="" aria-hidden="true">
+            </button>
+            <button type="button" class="strike-btn" id="strike-2" aria-label="Strike 3" aria-pressed="false">
+              <img class="strike-icon strike-icon--broken" src="assets/images/artifact-broken.svg" alt="" aria-hidden="true">
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-reset" id="btn-reset">Reset</button>
+      </div>
     </section>
   </main>
 
   <script src="js/config.js"></script>
   <script src="js/audio.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/settings.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

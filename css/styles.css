@@ -16,6 +16,7 @@
   --text: #E2F4F7;
   --text-muted: #7BA3B5;
   --disabled: #3D5A73;
+  --strike: #E879A8;
 }
 
 html,
@@ -36,11 +37,87 @@ body {
 }
 
 .app {
-  display: flex;
-  gap: 1.25rem;
   width: 100%;
   max-width: 480px;
   height: min(90dvh, 640px);
+}
+
+/* --- Screens --- */
+
+.screen {
+  width: 100%;
+  height: 100%;
+}
+
+.screen--hidden {
+  display: none;
+}
+
+.screen-menu,
+.screen-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  height: 100%;
+}
+
+.screen-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--teal-light);
+}
+
+.menu-logo {
+  max-width: 80%;
+  height: auto;
+}
+
+/* --- Settings --- */
+
+.settings-group {
+  border: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.option-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.option-btn {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  max-width: 140px;
+}
+
+.option-btn--active {
+  background: var(--teal);
+  border-color: var(--teal-light);
+  color: var(--bg);
+}
+
+/* --- Game screen --- */
+
+.screen-game {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
 }
 
 /* --- Bar panel --- */
@@ -93,7 +170,6 @@ body {
   transition: height 0.3s ease;
 }
 
-/* Threshold tick marks on the bar track */
 .bar-ticks {
   position: absolute;
   inset: 0;
@@ -108,24 +184,72 @@ body {
   background: rgba(226, 244, 247, 0.25);
 }
 
-/* --- Controls --- */
+/* --- Game panel --- */
 
-.controls {
+.game-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  min-width: 0;
+  height: 100%;
 }
 
-.turn-display {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--teal-light);
-  letter-spacing: 0.05em;
+.research-points {
+  text-align: center;
   margin-bottom: 0.5rem;
 }
+
+.research-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.research-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.research-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--teal-light);
+}
+
+.game-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.turn-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.strike-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* --- Buttons --- */
 
 .btn {
   border: 2px solid var(--accent);
@@ -146,9 +270,23 @@ body {
   border-color: var(--disabled);
 }
 
+.btn-primary {
+  padding: 0.85rem 2.5rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: var(--teal);
+  border-color: var(--teal-light);
+  color: var(--bg);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+}
+
 .btn-round {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -156,23 +294,36 @@ body {
 }
 
 .btn-round .arrow {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
+.btn-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--teal);
+  border-color: var(--teal-light);
+  color: var(--bg);
+}
+
+.btn-arrow:hover:not(:disabled) {
+  background: var(--accent);
+}
+
 .btn-mute {
-  width: 52px;
-  height: 52px;
-  margin-top: 0.5rem;
+  width: 48px;
+  height: 48px;
+  position: relative;
 }
 
 .btn-mute .mute-icon {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   line-height: 1;
-}
-
-.btn-mute {
-  position: relative;
 }
 
 .btn-mute.muted::after {
@@ -189,6 +340,7 @@ body {
 
 .btn-reset {
   margin-top: auto;
+  align-self: center;
   padding: 0.75rem 2.5rem;
   border-radius: 999px;
   font-size: 1.1rem;
@@ -208,13 +360,60 @@ body {
   background: var(--accent);
 }
 
+/* --- Strike buttons --- */
+
+.strike-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--strike);
+  background: var(--strike);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.strike-btn:active {
+  transform: scale(0.95);
+}
+
+.strike-icon--broken {
+  width: 100%;
+  height: 100%;
+  display: none;
+  border-radius: 50%;
+}
+
+.strike-btn--broken {
+  background: var(--surface);
+  border-color: var(--strike);
+}
+
+.strike-btn--broken .strike-icon--broken {
+  display: block;
+}
+
+.screen.screen--hidden {
+  display: none !important;
+}
+
 @media (max-width: 360px) {
-  .btn-round {
-    width: 60px;
-    height: 60px;
+  .btn-round,
+  .strike-btn {
+    width: 52px;
+    height: 52px;
   }
 
-  .turn-display {
-    font-size: 2rem;
+  .research-value {
+    font-size: 1.25rem;
+    min-width: 3rem;
+  }
+
+  .game-controls {
+    gap: 0.75rem;
   }
 }

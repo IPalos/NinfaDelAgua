@@ -1,13 +1,22 @@
-(function () {
+const Game = (() => {
   const barFill = document.getElementById("bar-fill");
   const barLabels = document.getElementById("bar-labels");
-  const turnDisplay = document.getElementById("turn-display");
+  const researchDisplay = document.getElementById("research-display");
   const btnPlus = document.getElementById("btn-plus");
   const btnMinus = document.getElementById("btn-minus");
   const btnMute = document.getElementById("btn-mute");
   const btnReset = document.getElementById("btn-reset");
+  const btnResearchPlus = document.getElementById("btn-research-plus");
+  const btnResearchMinus = document.getElementById("btn-research-minus");
+  const strikeButtons = [
+    document.getElementById("strike-0"),
+    document.getElementById("strike-1"),
+    document.getElementById("strike-2"),
+  ];
 
   let turn = CONFIG.maxTurn;
+  let researchPoints = 0;
+  let strikes = [false, false, false];
   let isMuted = false;
   let isStarted = false;
 
@@ -49,18 +58,28 @@
     track.appendChild(ticks);
   }
 
+  function updateStrikes() {
+    strikeButtons.forEach((btn, i) => {
+      btn.classList.toggle("strike-btn--broken", strikes[i]);
+      btn.setAttribute("aria-pressed", String(strikes[i]));
+    });
+  }
+
   function updateUI() {
     const pct = (turn / CONFIG.maxTurn) * 100;
     barFill.style.height = `${pct}%`;
-    turnDisplay.textContent = turn;
+    researchDisplay.textContent = researchPoints;
 
+    const highlightWindow = Math.max(2, Math.round(CONFIG.maxTurn * 0.25));
     barLabels.querySelectorAll(".bar-label").forEach((label) => {
       const val = Number(label.dataset.value);
-      label.classList.toggle("active", turn <= val && turn > val - 10);
+      label.classList.toggle("active", turn <= val && turn > val - highlightWindow);
     });
 
     btnPlus.disabled = turn >= CONFIG.maxTurn;
     btnMinus.disabled = turn <= CONFIG.minTurn;
+    btnResearchMinus.disabled = researchPoints <= 0;
+    updateStrikes();
   }
 
   function onTurnChange(prevTurn) {
@@ -81,9 +100,20 @@
     else updateUI();
   }
 
+  function changeResearch(delta) {
+    researchPoints = Math.max(0, researchPoints + delta);
+    updateUI();
+  }
+
+  function toggleStrike(index) {
+    strikes[index] = !strikes[index];
+    updateUI();
+  }
+
   function reset() {
-    const prev = turn;
     turn = CONFIG.maxTurn;
+    researchPoints = 0;
+    strikes = [false, false, false];
     isStarted = true;
     updateUI();
 
@@ -96,15 +126,42 @@
     AudioEngine.setMuted(isMuted);
     btnMute.classList.toggle("muted", isMuted);
     btnMute.setAttribute("aria-pressed", String(isMuted));
-    btnMute.setAttribute("aria-label", isMuted ? "Unmute" : "Mute");
+    btnMute.setAttribute("aria-label", isMuted ? "Activar sonido" : "Silenciar");
   }
 
-  btnPlus.addEventListener("click", () => changeTurn(1));
-  btnMinus.addEventListener("click", () => changeTurn(-1));
-  btnMute.addEventListener("click", toggleMute);
-  btnReset.addEventListener("click", reset);
+  function startGame({ mode, players }) {
+    const maxTurn = Settings.computeMaxTurn(mode, players);
+    CONFIG.maxTurn = maxTurn;
+    CONFIG.thresholds = computeThresholds(maxTurn);
+    turn = maxTurn;
+    researchPoints = 0;
+    strikes = [false, false, false];
+    isStarted = false;
+    buildLabels();
+    buildTicks();
+    updateUI();
+    Nav.showScreen("screen-game");
+  }
 
-  buildLabels();
-  buildTicks();
-  updateUI();
+  function init() {
+    btnPlus.addEventListener("click", () => changeTurn(1));
+    btnMinus.addEventListener("click", () => changeTurn(-1));
+    btnMute.addEventListener("click", toggleMute);
+    btnReset.addEventListener("click", reset);
+    btnResearchPlus.addEventListener("click", () => changeResearch(1));
+    btnResearchMinus.addEventListener("click", () => changeResearch(-1));
+    strikeButtons.forEach((btn, i) => {
+      btn.addEventListener("click", () => toggleStrike(i));
+    });
+
+    buildLabels();
+    buildTicks();
+    updateUI();
+    Nav.init();
+    Settings.init();
+  }
+
+  return { startGame, init };
 })();
+
+Game.init();
