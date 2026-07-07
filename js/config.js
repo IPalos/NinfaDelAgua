@@ -5,6 +5,13 @@ const CONFIG = {
   // Visual marks on the bar; also define track zones (high → low).
   thresholds: [40, 30, 20, 10, 5, 0],
 
+  // Short game (30-minute timer)
+  shortGameDurationSec: 30 * 60,
+  shortGameDurationMin: 30,
+  shortTrack: { src: "assets/audio/track-short.mp3" },
+
+  confettiThresholds: { short: 15, complete: 25 },
+
   // Musical timing
   barDurationSec: 4,
   crossfadeBars: 1,
@@ -26,6 +33,16 @@ function computeThresholds(maxTurn) {
 
   const ratios = [1, 0.75, 0.5, 0.25, 0.125, 0];
   const raw = ratios.map((r) => Math.round(maxTurn * r));
+  const unique = [...new Set(raw)].sort((a, b) => b - a);
+  if (unique[unique.length - 1] !== 0) unique.push(0);
+  return unique;
+}
+
+function computeTimeThresholds(durationMin) {
+  if (durationMin === 30) return [30, 22, 15, 8, 4, 0];
+
+  const ratios = [1, 0.75, 0.5, 0.25, 0.125, 0];
+  const raw = ratios.map((r) => Math.round(durationMin * r));
   const unique = [...new Set(raw)].sort((a, b) => b - a);
   if (unique[unique.length - 1] !== 0) unique.push(0);
   return unique;

@@ -28,7 +28,7 @@
       <fieldset class="settings-group">
         <legend class="settings-label">Tipo de partida</legend>
         <div class="option-row" role="group" aria-label="Tipo de partida">
-          <button type="button" class="btn option-btn" data-setting="mode" data-value="short" aria-pressed="true">
+          <button type="button" class="btn option-btn option-btn--active" data-setting="mode" data-value="short" aria-pressed="true">
             Partida corta
           </button>
           <button type="button" class="btn option-btn" data-setting="mode" data-value="complete" aria-pressed="false">
@@ -40,7 +40,7 @@
       <fieldset class="settings-group">
         <legend class="settings-label">Jugadores</legend>
         <div class="option-row" role="group" aria-label="Número de jugadores">
-          <button type="button" class="btn option-btn" data-setting="players" data-value="2" aria-pressed="true">2</button>
+          <button type="button" class="btn option-btn option-btn--active" data-setting="players" data-value="2" aria-pressed="true">2</button>
           <button type="button" class="btn option-btn" data-setting="players" data-value="3" aria-pressed="false">3</button>
           <button type="button" class="btn option-btn" data-setting="players" data-value="4" aria-pressed="false">4</button>
         </div>
@@ -52,9 +52,12 @@
     <!-- Turn Counter -->
     <section id="screen-game" class="screen screen-game screen--hidden" aria-label="Contador de turnos">
       <div class="bar-panel" aria-label="Progreso de turnos">
-        <div class="bar-labels" id="bar-labels"></div>
-        <div class="bar-track">
-          <div class="bar-fill" id="bar-fill"></div>
+        <div class="trimix-counter" id="trimix-display" aria-live="polite">40</div>
+        <div class="bar-body">
+          <div class="bar-labels" id="bar-labels"></div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-fill"></div>
+          </div>
         </div>
       </div>
 
@@ -98,11 +101,15 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-reset" id="btn-reset">Reset</button>
+        <div class="game-actions">
+          <button type="button" class="btn btn-reset" id="btn-reset">Reset</button>
+          <button type="button" class="btn btn-back" id="btn-back">Volver al menú</button>
+        </div>
       </div>
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/nav.js"></script>

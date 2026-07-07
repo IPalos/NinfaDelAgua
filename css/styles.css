@@ -104,12 +104,18 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   max-width: 140px;
+  opacity: 0.7;
+  transition: background 0.15s, opacity 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 
 .option-btn--active {
   background: var(--teal);
   border-color: var(--teal-light);
   color: var(--bg);
+  opacity: 1;
+  font-weight: 700;
+  transform: scale(1.02);
+  box-shadow: 0 0 0 2px var(--teal-light);
 }
 
 /* --- Game screen --- */
@@ -120,30 +126,54 @@ body {
   height: 100%;
 }
 
+.screen-game--short .btn-plus,
+.screen-game--short .btn-minus {
+  display: none;
+}
+
 /* --- Bar panel --- */
 
 .bar-panel {
   flex: 0 0 35%;
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   align-items: stretch;
   height: 100%;
+  min-width: 0;
+}
+
+.trimix-counter {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--teal-light);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.bar-body {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+  min-height: 0;
 }
 
 .bar-labels {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0.25rem 0;
+  position: relative;
+  flex: 0 0 auto;
   min-width: 2rem;
+  height: 100%;
 }
 
 .bar-label {
+  position: absolute;
+  right: 0;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted);
   line-height: 1;
+  transform: translateY(50%);
 }
 
 .bar-label.active {
@@ -339,8 +369,6 @@ body {
 }
 
 .btn-reset {
-  margin-top: auto;
-  align-self: center;
   padding: 0.75rem 2.5rem;
   border-radius: 999px;
   font-size: 1.1rem;
@@ -349,6 +377,28 @@ body {
   background: var(--teal);
   border-color: var(--teal-light);
   color: var(--bg);
+}
+
+.game-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-back {
+  padding: 0.65rem 2rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.btn-back:hover:not(:disabled) {
+  background: #1a4068;
 }
 
 .btn-reset:hover:not(:disabled),
@@ -411,6 +461,10 @@ body {
   .research-value {
     font-size: 1.25rem;
     min-width: 3rem;
+  }
+
+  .trimix-counter {
+    font-size: 1.25rem;
   }
 
   .game-controls {

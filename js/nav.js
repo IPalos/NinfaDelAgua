@@ -4,6 +4,9 @@ const Nav = (() => {
   function showScreen(screenId) {
     if (currentScreen === "screen-game" && screenId !== "screen-game") {
       AudioEngine.stop();
+      if (typeof Game !== "undefined" && Game.stopSession) {
+        Game.stopSession();
+      }
     }
 
     document.querySelectorAll(".screen").forEach((el) => {

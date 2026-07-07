@@ -12,10 +12,12 @@ Place your soundtrack files in this folder. Filenames must match the paths in `j
 | `track-zone-3.mp3` | Turns 6–10 |
 | `track-zone-4.mp3` | Turns 1–5 |
 | `track-zone-5.mp3` | Turn 0 |
+| `track-short.mp3` | Partida corta (30 minutes, single play, no loop) |
 
 ## Tips
 
 - Use **looping** tracks whose length matches `barDurationSec` in `js/config.js` (default: 4 seconds per bar) for clean bar-boundary transitions.
+- `track-short.mp3` should be exactly **30 minutes** long and does not loop.
 - MP3 is recommended for broad browser support; OGG can be added by updating `config.js` paths.
 - Until real files are added, the turn counter UI works normally but the console will warn about missing audio.
 

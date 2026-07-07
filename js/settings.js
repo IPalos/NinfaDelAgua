@@ -3,8 +3,8 @@ const Settings = (() => {
   let players = 2;
 
   function computeMaxTurn(gameMode, playerCount) {
-    const perPlayer = gameMode === "short" ? 6 : 10;
-    return perPlayer * playerCount;
+    if (gameMode === "short") return CONFIG.shortGameDurationMin;
+    return 10 * playerCount;
   }
 
   function getGameSettings() {

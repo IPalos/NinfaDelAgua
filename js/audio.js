@@ -2,6 +2,7 @@ const AudioEngine = (() => {
   let ctx = null;
   let masterGain = null;
   let tracks = [];
+  let singleTrack = null;
   let activeIndex = -1;
   let trackStartTime = 0;
   let isMuted = false;
@@ -23,9 +24,9 @@ const AudioEngine = (() => {
     return ctx;
   }
 
-  function createTrack(index, src) {
+  function createTrack(index, src, loop = true) {
     const audio = new Audio(src);
-    audio.loop = true;
+    audio.loop = loop;
     audio.preload = "auto";
     audio.addEventListener("error", () => {
       console.warn(`[AudioEngine] Could not load track ${index}: ${src}`);
@@ -58,6 +59,9 @@ const AudioEngine = (() => {
           track.gain.gain.cancelScheduledValues(now);
         }
       });
+      if (singleTrack?.gain) {
+        singleTrack.gain.gain.cancelScheduledValues(now);
+      }
     }
     pendingTarget = null;
   }
@@ -76,6 +80,16 @@ const AudioEngine = (() => {
       track.gain.gain.cancelScheduledValues(ctx.currentTime);
       track.gain.gain.value = 0;
     }
+  }
+
+  function stopSingleTrack() {
+    if (!singleTrack) return;
+    singleTrack.audio.pause();
+    if (singleTrack.gain && ctx) {
+      singleTrack.gain.gain.cancelScheduledValues(ctx.currentTime);
+      singleTrack.gain.gain.value = 0;
+    }
+    singleTrack = null;
   }
 
   function playTrack(index, gainValue) {
@@ -158,6 +172,7 @@ const AudioEngine = (() => {
   function start(targetIndex) {
     ensureContext();
     clearPending();
+    stopSingleTrack();
     isStarted = true;
     tracks.forEach((_, i) => stopTrack(i));
 
@@ -167,9 +182,30 @@ const AudioEngine = (() => {
     pendingTarget = null;
   }
 
+  function startSingle(src) {
+    ensureContext();
+    clearPending();
+    isStarted = true;
+    tracks.forEach((_, i) => stopTrack(i));
+    activeIndex = -1;
+
+    stopSingleTrack();
+    singleTrack = createTrack(-1, src, false);
+    connectTrack(singleTrack);
+    const now = ctx.currentTime;
+    singleTrack.gain.gain.cancelScheduledValues(now);
+    singleTrack.gain.gain.setValueAtTime(1, now);
+    singleTrack.audio.currentTime = 0;
+    singleTrack.audio.play().catch((err) => {
+      console.warn("[AudioEngine] Playback failed:", err.message);
+    });
+    pendingTarget = null;
+  }
+
   function stop() {
     clearPending();
     tracks.forEach((_, i) => stopTrack(i));
+    stopSingleTrack();
     activeIndex = -1;
     isStarted = false;
   }
@@ -183,5 +219,5 @@ const AudioEngine = (() => {
 
   init();
 
-  return { start, stop, setMuted, queueCrossfade };
+  return { start, startSingle, stop, setMuted, queueCrossfade };
 })();
