@@ -19,12 +19,13 @@ const CONFIG = {
   // One track per zone between consecutive thresholds.
   // Zone 0: turns 31–40, zone 1: 21–30, … zone 5: turn 0
   tracks: [
-    { src: "assets/audio/track-zone-0.mp3" },
-    { src: "assets/audio/track-zone-1.mp3" },
-    { src: "assets/audio/track-zone-2.mp3" },
-    { src: "assets/audio/track-zone-3.mp3" },
-    { src: "assets/audio/track-zone-4.mp3" },
-    { src: "assets/audio/track-zone-5.mp3" },
+    { src: "assets/audio/01-Quetzal.mp3" },
+    { src: "assets/audio/02-Lobo.mp3" },
+    { src: "assets/audio/03-Tecolote.mp3" },
+    { src: "assets/audio/04-Teporingo.mp3" },
+    { src: "assets/audio/05-Vaquita.mp3" },
+    { src: "assets/audio/06-Iguana.mp3" },
+    // { src: "assets/audio/07-Naia.mp3" },
   ],
 };
 

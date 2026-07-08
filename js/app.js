@@ -289,7 +289,11 @@ const Game = (() => {
     if (isShortMode()) {
       beginShortSession();
     } else {
-      isStarted = false;
+      isStarted = true;
+      turn = CONFIG.maxTurn;
+      updateUI();
+      const zone = getTrackIndex(turn);
+      AudioEngine.start(zone);
     }
   }
 
