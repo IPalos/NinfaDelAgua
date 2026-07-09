@@ -1,9 +1,14 @@
 const AudioEngine = (() => {
+  const FIRST_TRACK_DELAY_SEC = 8;
+  const MAIN_TRACK_TRANSITION_DELAY_SEC = 2;
+
   let ctx = null;
   let masterGain = null;
   let tracks = [];
+  let transitionTracks = [];
   let singleTrack = null;
   let activeIndex = -1;
+  let activeTransitionIndex = -1;
   let trackStartTime = 0;
   let isMuted = false;
   let isStarted = false;
@@ -46,15 +51,24 @@ const AudioEngine = (() => {
 
   function init() {
     tracks = CONFIG.tracks.map((t, i) => createTrack(i, t.src));
+    transitionTracks = (CONFIG.transitions || []).map((t, i) =>
+      createTrack(i, t.src, false)
+    );
   }
 
   function clearPending() {
     pendingTimeouts.forEach((id) => clearTimeout(id));
     pendingTimeouts = [];
+    stopAllTransitions();
 
     if (ctx) {
       const now = ctx.currentTime;
       tracks.forEach((track) => {
+        if (track.gain) {
+          track.gain.gain.cancelScheduledValues(now);
+        }
+      });
+      transitionTracks.forEach((track) => {
         if (track.gain) {
           track.gain.gain.cancelScheduledValues(now);
         }
@@ -82,6 +96,24 @@ const AudioEngine = (() => {
     }
   }
 
+  function stopTransition(index) {
+    const track = transitionTracks[index];
+    if (!track) return;
+    track.audio.pause();
+    if (track.gain && ctx) {
+      track.gain.gain.cancelScheduledValues(ctx.currentTime);
+      track.gain.gain.value = 0;
+    }
+    if (activeTransitionIndex === index) {
+      activeTransitionIndex = -1;
+    }
+  }
+
+  function stopAllTransitions() {
+    transitionTracks.forEach((_, i) => stopTransition(i));
+    activeTransitionIndex = -1;
+  }
+
   function stopSingleTrack() {
     if (!singleTrack) return;
     singleTrack.audio.pause();
@@ -104,12 +136,38 @@ const AudioEngine = (() => {
     });
   }
 
+  function playTransition(index) {
+    const track = transitionTracks[index];
+    if (!track) return;
+
+    if (activeTransitionIndex >= 0) {
+      stopTransition(activeTransitionIndex);
+    }
+
+    connectTrack(track);
+    const now = ctx.currentTime;
+    track.gain.gain.cancelScheduledValues(now);
+    track.gain.gain.setValueAtTime(1, now);
+    track.audio.currentTime = 0;
+    track.audio.play().catch((err) => {
+      console.warn("[AudioEngine] Transition playback failed:", err.message);
+    });
+    activeTransitionIndex = index;
+    track.audio.onended = () => {
+      if (activeTransitionIndex === index) {
+        activeTransitionIndex = -1;
+      }
+    };
+  }
+
   function performCrossfade(fromIndex, toIndex) {
     const now = ctx.currentTime;
     const wait = timeToBarEnd();
     const crossfadeDur = CONFIG.crossfadeBars * CONFIG.barDurationSec;
     const fadeStart = now + wait;
     const fadeEnd = fadeStart + crossfadeDur;
+    const mainFadeStart = fadeStart + MAIN_TRACK_TRANSITION_DELAY_SEC;
+    const mainFadeEnd = mainFadeStart + crossfadeDur;
 
     const fromTrack = tracks[fromIndex];
     if (fromTrack?.gain) {
@@ -122,22 +180,28 @@ const AudioEngine = (() => {
     const toTrack = tracks[toIndex];
     connectTrack(toTrack);
     toTrack.gain.gain.setValueAtTime(0, now);
-    toTrack.gain.gain.setValueAtTime(0, fadeStart);
-    toTrack.gain.gain.linearRampToValueAtTime(1, fadeEnd);
+    toTrack.gain.gain.setValueAtTime(0, mainFadeStart);
+    toTrack.gain.gain.linearRampToValueAtTime(1, mainFadeEnd);
 
-    const playDelay = Math.max(0, (fadeStart - now) * 1000);
+    const transitionDelay = Math.max(0, (fadeStart - now) * 1000);
+    const transitionId = setTimeout(() => {
+      playTransition(toIndex);
+    }, transitionDelay);
+    pendingTimeouts.push(transitionId);
+
+    const mainPlayDelay = Math.max(0, (mainFadeStart - now) * 1000);
     const playId = setTimeout(() => {
       toTrack.audio.currentTime = 0;
       toTrack.audio.play().catch(() => {});
-    }, playDelay);
+    }, mainPlayDelay);
     pendingTimeouts.push(playId);
 
     const finishId = setTimeout(() => {
       stopTrack(fromIndex);
       activeIndex = toIndex;
-      trackStartTime = fadeEnd;
+      trackStartTime = mainFadeEnd;
       pendingTarget = null;
-    }, (wait + crossfadeDur) * 1000 + 50);
+    }, (wait + MAIN_TRACK_TRANSITION_DELAY_SEC + crossfadeDur) * 1000 + 50);
     pendingTimeouts.push(finishId);
   }
 
@@ -148,9 +212,18 @@ const AudioEngine = (() => {
     clearPending();
 
     if (activeIndex < 0) {
-      playTrack(targetIndex, 1);
       activeIndex = targetIndex;
-      trackStartTime = ctx.currentTime;
+      if (targetIndex === 0) {
+        playTransition(0);
+        const id = setTimeout(() => {
+          playTrack(0, 1);
+          trackStartTime = ctx.currentTime;
+        }, FIRST_TRACK_DELAY_SEC * 1000);
+        pendingTimeouts.push(id);
+      } else {
+        playTrack(targetIndex, 1);
+        trackStartTime = ctx.currentTime;
+      }
       return;
     }
 
@@ -177,8 +250,17 @@ const AudioEngine = (() => {
     tracks.forEach((_, i) => stopTrack(i));
 
     activeIndex = targetIndex;
-    playTrack(targetIndex, 1);
-    trackStartTime = ctx.currentTime;
+    if (targetIndex === 0) {
+      playTransition(0);
+      const id = setTimeout(() => {
+        playTrack(0, 1);
+        trackStartTime = ctx.currentTime;
+      }, FIRST_TRACK_DELAY_SEC * 1000);
+      pendingTimeouts.push(id);
+    } else {
+      playTrack(targetIndex, 1);
+      trackStartTime = ctx.currentTime;
+    }
     pendingTarget = null;
   }
 
@@ -205,6 +287,7 @@ const AudioEngine = (() => {
   function stop() {
     clearPending();
     tracks.forEach((_, i) => stopTrack(i));
+    stopAllTransitions();
     stopSingleTrack();
     activeIndex = -1;
     isStarted = false;

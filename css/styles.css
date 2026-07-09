@@ -17,6 +17,13 @@
   --text-muted: #7BA3B5;
   --disabled: #3D5A73;
   --strike: #E879A8;
+
+  --light-blue:#8bd1e4;
+  --mid-blue:#188fb0;
+  --dark-blue:#07596f;
+  --white:#ffffff;
+  --lato: 'Lato', sans-serif;
+  --luckiest-guy: 'Luckiest Guy', bold;
 }
 
 html,
@@ -25,7 +32,7 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background: var(--mid-blue);
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   display: flex;
@@ -53,7 +60,17 @@ body {
   display: none;
 }
 
-.screen-menu,
+.screen-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  height: 100%;
+  overflow: hidden;
+}
+
 .screen-settings {
   display: flex;
   flex-direction: column;
@@ -69,9 +86,28 @@ body {
   color: var(--teal-light);
 }
 
-.menu-logo {
-  max-width: 80%;
+.menu-logo-app {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
   height: auto;
+  pointer-events: none;
+}
+
+.menu-piedra {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.screen-menu .btn-primary {
+  position: relative;
+  z-index: 1;
 }
 
 /* --- Settings --- */
@@ -303,11 +339,13 @@ body {
 .btn-primary {
   padding: 0.85rem 2.5rem;
   border-radius: 999px;
+  font-family: var(--luckiest-guy);
   font-size: 1.1rem;
   font-weight: 600;
-  background: var(--teal);
-  border-color: var(--teal-light);
-  color: var(--bg);
+  background: var(--light-blue);
+  border-color: var(--white);
+  border-width: 10px;
+  color: var(--dark-blue);
 }
 
 .btn-primary:hover:not(:disabled) {
