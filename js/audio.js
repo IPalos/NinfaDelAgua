@@ -24,7 +24,7 @@ const AudioEngine = (() => {
       masterGain.connect(ctx.destination);
     }
     if (ctx.state === "suspended") {
-      ctx.resume();
+      ctx.resume().catch(() => {});
     }
     return ctx;
   }
@@ -54,6 +54,9 @@ const AudioEngine = (() => {
     transitionTracks = (CONFIG.transitions || []).map((t, i) =>
       createTrack(i, t.src, false)
     );
+    if (CONFIG.shortTrack?.src) {
+      singleTrack = createTrack(-1, CONFIG.shortTrack.src, false);
+    }
   }
 
   function clearPending() {
@@ -121,6 +124,10 @@ const AudioEngine = (() => {
       singleTrack.gain.gain.cancelScheduledValues(ctx.currentTime);
       singleTrack.gain.gain.value = 0;
     }
+  }
+
+  function disposeSingleTrack() {
+    stopSingleTrack();
     singleTrack = null;
   }
 
@@ -264,24 +271,86 @@ const AudioEngine = (() => {
     pendingTarget = null;
   }
 
-  function startSingle(src) {
+  function playMedia(audio) {
+    const start = () => {
+      audio.play().catch((err) => {
+        console.warn("[AudioEngine] Playback failed:", err.message);
+      });
+    };
+
+    if (audio.readyState >= 1) {
+      try {
+        audio.currentTime = 0;
+      } catch (_) {
+        /* ignore seek before metadata in older browsers */
+      }
+      start();
+      return;
+    }
+
+    // Avoid seeking before metadata is ready — on large unloaded files that can
+    // throw and skip play() entirely. Fresh elements already start at 0.
+    const onReady = () => {
+      audio.removeEventListener("loadedmetadata", onReady);
+      try {
+        audio.currentTime = 0;
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    audio.addEventListener("loadedmetadata", onReady);
+    start();
+  }
+
+  function startSingle(src, options = {}) {
+    const loop = Boolean(options.loop);
+    const restart = options.restart !== false;
+
     ensureContext();
     clearPending();
     isStarted = true;
     tracks.forEach((_, i) => stopTrack(i));
+    stopAllTransitions();
     activeIndex = -1;
 
-    stopSingleTrack();
-    singleTrack = createTrack(-1, src, false);
+    const sameSrc = singleTrack && singleTrack.audio.src.indexOf(src) !== -1;
+    if (sameSrc && !restart) {
+      singleTrack.audio.loop = loop;
+      connectTrack(singleTrack);
+      const now = ctx.currentTime;
+      singleTrack.gain.gain.cancelScheduledValues(now);
+      singleTrack.gain.gain.setValueAtTime(1, now);
+      if (singleTrack.audio.paused) {
+        singleTrack.audio.play().catch((err) => {
+          console.warn("[AudioEngine] Playback failed:", err.message);
+        });
+      }
+      pendingTarget = null;
+      return;
+    }
+
+    if (!sameSrc) {
+      disposeSingleTrack();
+      singleTrack = createTrack(-1, src, loop);
+    } else {
+      singleTrack.audio.pause();
+      singleTrack.audio.loop = loop;
+    }
+
     connectTrack(singleTrack);
     const now = ctx.currentTime;
     singleTrack.gain.gain.cancelScheduledValues(now);
     singleTrack.gain.gain.setValueAtTime(1, now);
-    singleTrack.audio.currentTime = 0;
-    singleTrack.audio.play().catch((err) => {
-      console.warn("[AudioEngine] Playback failed:", err.message);
-    });
+    playMedia(singleTrack.audio);
     pendingTarget = null;
+  }
+
+  function startMenu(options = {}) {
+    if (!CONFIG.menuTrack?.src) return;
+    startSingle(CONFIG.menuTrack.src, {
+      loop: true,
+      restart: Boolean(options.restart),
+    });
   }
 
   function stop() {
@@ -302,5 +371,5 @@ const AudioEngine = (() => {
 
   init();
 
-  return { start, startSingle, stop, setMuted, queueCrossfade };
+  return { start, startSingle, startMenu, stop, setMuted, queueCrossfade };
 })();

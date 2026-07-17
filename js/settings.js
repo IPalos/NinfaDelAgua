@@ -31,6 +31,8 @@ const Settings = (() => {
     const btnStartGame = document.getElementById("btn-start-game");
 
     btnStartMenu.addEventListener("click", () => {
+      // Unlock / start menu music on first user gesture (autoplay may be blocked).
+      AudioEngine.startMenu();
       Nav.showScreen("screen-settings");
     });
 

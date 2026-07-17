@@ -11,6 +11,9 @@ const CONFIG = {
   shortGameDurationMin: 30,
   shortTrack: { src: "assets/audio/track-short.mp3" },
 
+  // Main menu ambient (separate from in-game zone tracks)
+  menuTrack: { src: "assets/audio/07-Naia.mp3" },
+
   confettiThresholds: { short: 15, complete: 25 },
 
   // Musical timing
