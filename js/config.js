@@ -12,7 +12,7 @@ const CONFIG = {
   shortTrack: { src: "assets/audio/track-short.mp3" },
 
   // Main menu ambient (separate from in-game zone tracks)
-  menuTrack: { src: "assets/audio/07-Naia.mp3" },
+  menuTrack: { src: "assets/audio/7. Suite de Naia (la buena).mp3" },
 
   confettiThresholds: { short: 15, complete: 25 },
 

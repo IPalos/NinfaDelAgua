@@ -25,34 +25,37 @@
 
     <!-- Game Settings -->
     <section id="screen-settings" class="screen screen-settings screen--hidden" aria-label="Configuración de partida">
-      <h1 class="screen-title">Configuración</h1>
+      <div class="settings-card">
+        <h1 class="screen-title">Configuración</h1>
 
-      <fieldset class="settings-group">
-        <legend class="settings-label">Tipo de partida</legend>
-        <div class="option-row" role="group" aria-label="Tipo de partida">
-          <button type="button" class="btn option-btn option-btn--active" data-setting="mode" data-value="short"
-            aria-pressed="true">
-            Partida corta
-          </button>
-          <button type="button" class="btn option-btn" data-setting="mode" data-value="complete" aria-pressed="false">
-            Partida completa
-          </button>
-        </div>
-      </fieldset>
+        <fieldset class="settings-group">
+          <legend class="settings-label">Tipo de partida</legend>
+          <div class="option-row" role="group" aria-label="Tipo de partida">
+            <button type="button" class="btn option-btn option-btn--active" data-setting="mode" data-value="short"
+              aria-pressed="true">
+              Partida corta
+            </button>
+            <button type="button" class="btn option-btn" data-setting="mode" data-value="complete" aria-pressed="false">
+              Partida completa
+            </button>
+          </div>
+        </fieldset>
 
-      <fieldset class="settings-group">
-        <legend class="settings-label">Jugadores</legend>
-        <div class="option-row" role="group" aria-label="Número de jugadores">
-          <button type="button" class="btn option-btn option-btn--active" data-setting="players" data-value="2"
-            aria-pressed="true">2</button>
-          <button type="button" class="btn option-btn" data-setting="players" data-value="3"
-            aria-pressed="false">3</button>
-          <button type="button" class="btn option-btn" data-setting="players" data-value="4"
-            aria-pressed="false">4</button>
-        </div>
-      </fieldset>
+        <fieldset class="settings-group">
+          <legend class="settings-label">Jugadores</legend>
+          <div class="option-row option-row--players" role="group" aria-label="Número de jugadores">
+            <button type="button" class="btn option-btn option-btn--circle option-btn--active" data-setting="players"
+              data-value="2" aria-pressed="true">2</button>
+            <button type="button" class="btn option-btn option-btn--circle" data-setting="players" data-value="3"
+              aria-pressed="false">3</button>
+            <button type="button" class="btn option-btn option-btn--circle" data-setting="players" data-value="4"
+              aria-pressed="false">4</button>
+          </div>
+        </fieldset>
 
-      <button type="button" class="btn btn-primary" id="btn-start-game">Iniciar partida</button>
+        <button type="button" class="btn btn-primary btn-start-game" id="btn-start-game">Iniciar partida</button>
+      </div>
+      <img class="settings-piedra" src="assets/images/Piedra.png" alt="" aria-hidden="true">
     </section>
 
     <!-- Turn Counter -->
