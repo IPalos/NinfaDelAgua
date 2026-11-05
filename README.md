@@ -34,7 +34,7 @@ Audio requires a user gesture (press **Reset**) before playback starts.
 
 ## Local preview
 
-Serve the project root with any static file server:
+Serve the project root with any static file server (required for the PWA / service worker — opening `index.html` as a file will not work):
 
 ```bash
 # Python
@@ -45,6 +45,28 @@ npx serve .
 ```
 
 Open `http://localhost:8080` in your browser.
+
+## Install on a phone (PWA)
+
+This project is a Progressive Web App. After you deploy it over **HTTPS** (for example GitHub Pages below), you can install it like a native app. Audio and the rest of the game work in the installed app; soundtrack files are cached the first time they play so later visits can work offline.
+
+### Android (Chrome)
+
+1. Open the live site URL in Chrome.
+2. Tap the browser menu (⋮) → **Install app** / **Add to Home screen**, or use the install banner if it appears.
+3. Confirm. The app opens fullscreen from the home screen icon.
+
+### iPhone / iPad (Safari)
+
+1. Open the live site URL in **Safari** (not Chrome).
+2. Tap the Share button → **Add to Home Screen**.
+3. Tap **Add**. Launch from the new home screen icon for the standalone experience.
+
+### Notes
+
+- Install only works on **HTTPS** (or `localhost` while testing).
+- Google Fonts still need a network connection the first time; the rest of the UI is cached after the first visit.
+- Large audio (especially the short-game track) is **not** downloaded at install — it caches after you play once.
 
 ## Configuration
 
@@ -86,20 +108,24 @@ See [`assets/audio/README.md`](assets/audio/README.md) for how to add soundtrack
    https://<username>.github.io/NinfaDelAgua/
    ```
 
-The included [`.nojekyll`](.nojekyll) file prevents Jekyll from interfering with the `assets/` folder.
+That HTTPS URL is what you use for **Install on a phone** above. The included [`.nojekyll`](.nojekyll) file prevents Jekyll from interfering with the `assets/` folder.
 
 ## Project structure
 
 ```
-index.html              All screens (menu, settings, game)
+index.html              App screens (menu + game)
+manifest.webmanifest    PWA install metadata
+sw.js                   Service worker (offline shell + audio cache)
 css/styles.css          Mobile layout and deep blue / teal theme
 js/config.js            Thresholds, bar timing, track paths
 js/nav.js               Screen routing
-js/settings.js          Game settings UI and turn computation
 js/audio.js             Web Audio API crossfade engine
 js/app.js               Turn counter and game state logic
-assets/images/          Logo and strike icons (placeholders)
-assets/audio/           Soundtrack files (add your own MP3s)
+js/pwa.js               Service worker registration
+vendor/                 Local third-party scripts (confetti)
+assets/icons/           PWA / home-screen icons
+assets/images/          Logo and strike icons
+assets/audio/           Soundtrack and SFX files
 ```
 
 ## License
