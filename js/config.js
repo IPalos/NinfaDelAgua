@@ -9,10 +9,10 @@ const CONFIG = {
   // Short game (30-minute timer)
   shortGameDurationSec: 30 * 60,
   shortGameDurationMin: 30,
-  shortTrack: { src: "assets/audio/track-short.mp3" },
+  shortTrack: { src: "assets/audio/shortGame.ogg" },
 
   // Main menu ambient (separate from in-game zone tracks)
-  menuTrack: { src: "assets/audio/7. Suite de Naia (la buena).mp3" },
+  menuTrack: { src: "assets/audio/07-Naia.ogg" },
 
   confettiThresholds: { short: 15, complete: 25 },
 
@@ -22,13 +22,13 @@ const CONFIG = {
 
   // One track per zone between consecutive thresholds (6 zones + post-game at 0).
   tracks: [
-    { src: "assets/audio/01-Quetzal.mp3" },
-    { src: "assets/audio/02-Lobo.mp3" },
-    { src: "assets/audio/03-Tecolote.mp3" },
-    { src: "assets/audio/04-Teporingo.mp3" },
-    { src: "assets/audio/05-Vaquita.mp3" },
-    { src: "assets/audio/06-Iguana.mp3" },
-    { src: "assets/audio/07-Naia.mp3" },
+    { src: "assets/audio/01-Quetzal.ogg" },
+    { src: "assets/audio/02-Lobo.ogg" },
+    { src: "assets/audio/03-Tecolote.ogg" },
+    { src: "assets/audio/04-Teporingo.ogg" },
+    { src: "assets/audio/05-Vaquita.ogg" },
+    { src: "assets/audio/06-Iguana.ogg" },
+    { src: "assets/audio/07-Naia.ogg" },
   ],
 
   // Transition stingers: TR01 with track 1 at start, TR0N when crossfading to track N.
