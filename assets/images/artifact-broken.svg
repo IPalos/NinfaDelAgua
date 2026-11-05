@@ -1,5 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Artefacto roto">
-  <circle cx="32" cy="32" r="28" fill="#3D1F3A" stroke="#E879A8" stroke-width="2"/>
-  <path d="M20 24 L28 36 L22 44 L36 40 L44 28 L38 20 Z" fill="none" stroke="#E879A8" stroke-width="2" stroke-linejoin="round"/>
-  <line x1="18" y1="46" x2="46" y2="18" stroke="#E74C3C" stroke-width="3" stroke-linecap="round"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="150"
+   height="150"
+   viewBox="0 0 39.6875 39.6875"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="artifact-broken.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="2"
+     inkscape:cx="-60.25"
+     inkscape:cy="102"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#652c36;fill-opacity:1;stroke:#d4566b;stroke-width:0.778187;stroke-linecap:square;stroke-miterlimit:1.6;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+       id="path1"
+       sodipodi:type="arc"
+       sodipodi:cx="19.843752"
+       sodipodi:cy="19.844547"
+       sodipodi:rx="19.454655"
+       sodipodi:ry="19.454655"
+       sodipodi:start="4.7122243"
+       sodipodi:end="4.707732"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 19.840548,0.38989284 A 19.454655,19.454655 0 0 1 39.29839,19.819494 19.454655,19.454655 0 0 1 19.890654,39.299145 19.454655,19.454655 0 0 1 0.38921869,19.913298 19.454655,19.454655 0 0 1 19.753152,0.39010354" />
+    <g
+       id="g3"
+       transform="rotate(9.5060622,1.161527,9.4354793)">
+      <path
+         style="fill:#a84051;fill-opacity:1;stroke:none;stroke-width:0.79375;stroke-linecap:square;stroke-miterlimit:1.6;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 30.820637,5.6057385 c 3.173978,1.8995558 4.983549,6.3663525 4.696354,10.0541655 -0.536523,6.889366 -11.57552,17.197916 -11.57552,17.197916 0,0 -14.074797,-6.65772 -16.5757083,-13.099511 C 6.0270496,16.31008 6.4712901,11.511176 8.9624495,8.7768448 11.522233,5.9671898 16.994878,9.3518208 16.65583,10.465992 l -1.688162,4.253498 5.980385,3.592651 -2.16162,5.995576 3.922786,3.400665 -1.851571,-3.848092 3.550838,-6.630604 -3.565058,-3.024632 3.098043,-4.7628572 C 24.191237,8.441736 27.559224,3.6538545 30.820637,5.6057385 Z"
+         id="path2"
+         sodipodi:nodetypes="sscsscccccccccs" />
+    </g>
+  </g>
 </svg>

@@ -23,43 +23,8 @@
       <button type="button" class="btn btn-primary" id="btn-start-menu">Comenzar Juego</button>
     </section>
 
-    <!-- Game Settings -->
-    <section id="screen-settings" class="screen screen-settings screen--hidden" aria-label="Configuración de partida">
-      <div class="settings-card">
-        <h1 class="screen-title">Configuración</h1>
-
-        <fieldset class="settings-group">
-          <legend class="settings-label">Tipo de partida</legend>
-          <div class="option-row" role="group" aria-label="Tipo de partida">
-            <button type="button" class="btn option-btn option-btn--active" data-setting="mode" data-value="short"
-              aria-pressed="true">
-              Partida corta
-            </button>
-            <button type="button" class="btn option-btn" data-setting="mode" data-value="complete" aria-pressed="false">
-              Partida completa
-            </button>
-          </div>
-        </fieldset>
-
-        <fieldset class="settings-group">
-          <legend class="settings-label">Jugadores</legend>
-          <div class="option-row option-row--players" role="group" aria-label="Número de jugadores">
-            <button type="button" class="btn option-btn option-btn--circle option-btn--active" data-setting="players"
-              data-value="2" aria-pressed="true">2</button>
-            <button type="button" class="btn option-btn option-btn--circle" data-setting="players" data-value="3"
-              aria-pressed="false">3</button>
-            <button type="button" class="btn option-btn option-btn--circle" data-setting="players" data-value="4"
-              aria-pressed="false">4</button>
-          </div>
-        </fieldset>
-
-        <button type="button" class="btn btn-primary btn-start-game" id="btn-start-game">Iniciar partida</button>
-      </div>
-      <img class="settings-piedra" src="assets/images/Piedra.png" alt="" aria-hidden="true">
-    </section>
-
-    <!-- Turn Counter -->
-    <section id="screen-game" class="screen screen-game screen--hidden" aria-label="Contador de turnos">
+    <!-- Game -->
+    <section id="screen-game" class="screen screen-game screen-game--short screen--hidden" aria-label="Contador de turnos">
       <div class="bar-panel" aria-label="Progreso de turnos">
         <div class="trimix-counter" id="trimix-display" aria-live="polite">40</div>
         <div class="bar-body">
@@ -128,7 +93,6 @@
   <script src="js/config.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/nav.js"></script>
-  <script src="js/settings.js"></script>
   <script src="js/app.js"></script>
 </body>
 

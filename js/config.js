@@ -14,7 +14,16 @@ const CONFIG = {
   // Main menu ambient (separate from in-game zone tracks)
   menuTrack: { src: "assets/audio/07-Naia.ogg" },
 
-  confettiThresholds: { short: 15, complete: 25 },
+  // Menu → gameplay music crossfade when starting a session
+  menuToGameFadeSec: 5,
+
+  confettiThreshold: 15,
+
+  sfx: {
+    artifactBroken: "assets/audio/ArtifactBroken.ogg",
+    win: "assets/audio/GANAR.ogg",
+    lose: "assets/audio/PERDER.ogg",
+  },
 
   // Musical timing
   barDurationSec: 4,
@@ -22,24 +31,12 @@ const CONFIG = {
 
   // One track per zone between consecutive thresholds (6 zones + post-game at 0).
   tracks: [
-    { src: "assets/audio/01-Quetzal.ogg" },
-    { src: "assets/audio/02-Lobo.ogg" },
-    { src: "assets/audio/03-Tecolote.ogg" },
-    { src: "assets/audio/04-Teporingo.ogg" },
-    { src: "assets/audio/05-Vaquita.ogg" },
-    { src: "assets/audio/06-Iguana.ogg" },
     { src: "assets/audio/07-Naia.ogg" },
   ],
 
   // Transition stingers: TR01 with track 1 at start, TR0N when crossfading to track N.
   transitions: [
     { src: "assets/audio/NINFA DEL AGUA - TR 1.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 2.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 3.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 4.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 5.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 6.mp3" },
-    { src: "assets/audio/NINFA DEL AGUA - TR 7.mp3" },
   ],
 };
 

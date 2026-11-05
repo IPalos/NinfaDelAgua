@@ -7,6 +7,8 @@ const AudioEngine = (() => {
   let tracks = [];
   let transitionTracks = [];
   let singleTrack = null;
+  let outgoingSingleTrack = null;
+  let sfxTracks = {};
   let activeIndex = -1;
   let activeTransitionIndex = -1;
   let trackStartTime = 0;
@@ -57,6 +59,11 @@ const AudioEngine = (() => {
     if (CONFIG.shortTrack?.src) {
       singleTrack = createTrack(-1, CONFIG.shortTrack.src, false);
     }
+    if (CONFIG.sfx) {
+      Object.entries(CONFIG.sfx).forEach(([key, src]) => {
+        sfxTracks[key] = createTrack(`sfx-${key}`, src, false);
+      });
+    }
   }
 
   function clearPending() {
@@ -78,6 +85,9 @@ const AudioEngine = (() => {
       });
       if (singleTrack?.gain) {
         singleTrack.gain.gain.cancelScheduledValues(now);
+      }
+      if (outgoingSingleTrack?.gain) {
+        outgoingSingleTrack.gain.gain.cancelScheduledValues(now);
       }
     }
     pendingTarget = null;
@@ -117,13 +127,22 @@ const AudioEngine = (() => {
     activeTransitionIndex = -1;
   }
 
-  function stopSingleTrack() {
-    if (!singleTrack) return;
-    singleTrack.audio.pause();
-    if (singleTrack.gain && ctx) {
-      singleTrack.gain.gain.cancelScheduledValues(ctx.currentTime);
-      singleTrack.gain.gain.value = 0;
+  function stopTrackElement(track) {
+    if (!track) return;
+    track.audio.pause();
+    if (track.gain && ctx) {
+      track.gain.gain.cancelScheduledValues(ctx.currentTime);
+      track.gain.gain.value = 0;
     }
+  }
+
+  function stopSingleTrack() {
+    stopTrackElement(singleTrack);
+  }
+
+  function stopOutgoingSingleTrack() {
+    stopTrackElement(outgoingSingleTrack);
+    outgoingSingleTrack = null;
   }
 
   function disposeSingleTrack() {
@@ -308,6 +327,7 @@ const AudioEngine = (() => {
 
     ensureContext();
     clearPending();
+    stopOutgoingSingleTrack();
     isStarted = true;
     tracks.forEach((_, i) => stopTrack(i));
     stopAllTransitions();
@@ -345,6 +365,53 @@ const AudioEngine = (() => {
     pendingTarget = null;
   }
 
+  function crossfadeToSingle(src, options = {}) {
+    const loop = Boolean(options.loop);
+    const durationSec = Math.max(0, Number(options.durationSec) || 0);
+
+    ensureContext();
+    clearPending();
+    stopOutgoingSingleTrack();
+    isStarted = true;
+    tracks.forEach((_, i) => stopTrack(i));
+    stopAllTransitions();
+    activeIndex = -1;
+
+    const fromTrack = singleTrack;
+    const sameSrc = fromTrack && fromTrack.audio.src.indexOf(src) !== -1;
+
+    if (!fromTrack || durationSec <= 0 || sameSrc) {
+      startSingle(src, { loop, restart: true });
+      return;
+    }
+
+    const toTrack = createTrack(-1, src, loop);
+    connectTrack(fromTrack);
+    connectTrack(toTrack);
+
+    const now = ctx.currentTime;
+    const fromGain = fromTrack.gain.gain.value;
+    fromTrack.gain.gain.cancelScheduledValues(now);
+    fromTrack.gain.gain.setValueAtTime(fromGain, now);
+    fromTrack.gain.gain.linearRampToValueAtTime(0, now + durationSec);
+
+    toTrack.gain.gain.cancelScheduledValues(now);
+    toTrack.gain.gain.setValueAtTime(0, now);
+    toTrack.gain.gain.linearRampToValueAtTime(1, now + durationSec);
+    playMedia(toTrack.audio);
+
+    outgoingSingleTrack = fromTrack;
+    singleTrack = toTrack;
+    pendingTarget = null;
+
+    const finishId = setTimeout(() => {
+      if (outgoingSingleTrack === fromTrack) {
+        stopOutgoingSingleTrack();
+      }
+    }, durationSec * 1000 + 50);
+    pendingTimeouts.push(finishId);
+  }
+
   function startMenu(options = {}) {
     if (!CONFIG.menuTrack?.src) return;
     startSingle(CONFIG.menuTrack.src, {
@@ -353,10 +420,22 @@ const AudioEngine = (() => {
     });
   }
 
+  function playSfx(key) {
+    const track = sfxTracks[key];
+    if (!track) return;
+    ensureContext();
+    connectTrack(track);
+    const now = ctx.currentTime;
+    track.gain.gain.cancelScheduledValues(now);
+    track.gain.gain.setValueAtTime(1, now);
+    playMedia(track.audio);
+  }
+
   function stop() {
     clearPending();
     tracks.forEach((_, i) => stopTrack(i));
     stopAllTransitions();
+    stopOutgoingSingleTrack();
     stopSingleTrack();
     activeIndex = -1;
     isStarted = false;
@@ -371,5 +450,14 @@ const AudioEngine = (() => {
 
   init();
 
-  return { start, startSingle, startMenu, stop, setMuted, queueCrossfade };
+  return {
+    start,
+    startSingle,
+    crossfadeToSingle,
+    startMenu,
+    playSfx,
+    stop,
+    setMuted,
+    queueCrossfade,
+  };
 })();

@@ -2,7 +2,7 @@ const Nav = (() => {
   let currentScreen = null;
 
   function isPreGameScreen(screenId) {
-    return screenId === "screen-menu" || screenId === "screen-settings";
+    return screenId === "screen-menu";
   }
 
   function showScreen(screenId) {
